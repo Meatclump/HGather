@@ -4,6 +4,8 @@
 *
 * Used atom0s equipmon as a base for the config elements of this addon
 * https://ashitaxi.com/';
+*
+* Modified by Meatclump to add fallback setting for use with <lastst>
 --]]
 
 addon.name      = 'hgather';
