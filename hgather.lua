@@ -103,6 +103,7 @@ local hgather = T{
     last_attempt = 0,
     last_item = '',
     attempt_type = '',
+    fallback = '',
 
     pricing = T{ },
 
@@ -960,6 +961,7 @@ function print_help(isError)
         { '/hgather clear', 'Clears the HGather session stats (all: default | dig | mine | exca).' },
         { '/hgather show', 'Shows the HGather information.' },
         { '/hgather hide', 'Hides the HGather information.' },
+        { '/hgather fallback', 'Set fallback activity (h | e | l | m).' },
     };
 
     -- Print the command list..
@@ -1020,6 +1022,15 @@ ashita.events.register('command', 'command_cb', function (e)
     -- Handle: /hgather edit - Toggles the hgather editor.
     if (#args == 1 or (#args >= 2 and args[2]:any('edit'))) then
         hgather.editor.is_open[1] = not hgather.editor.is_open[1];
+        return;
+    end
+
+    if (#args >= 2 and args[2]:any('fallback')) then
+        if (args[3] ~= nil) then
+            hgather.fallback = args[3];
+        else
+            print(chat.header(addon.name):append(chat.message('Set fallback activity. h = harvesting, e = excavating, l = logging, m = mining, c = clear')));
+        end
         return;
     end
 
@@ -1129,7 +1140,30 @@ ashita.events.register('packet_out', 'packet_out_cb', function (e)
             if (hgather.settings.first_attempt == 0) then
                 hgather.settings.first_attempt = ashita.time.clock()['ms'];
             end
+        else
+            -- some helm event?
+            if (hgather.fallback ~= '') then
+                if (hgather.fallback == 'h') then
+                    hgather.attempt_type = 'harvest';
+                elseif (hgather.fallback == 'e') then
+                    hgather.attempt_type = 'excavate';
+                elseif (hgather.fallback == 'l') then
+                    hgather.attempt_type = 'logging';
+                elseif (hgather.fallback == 'm') then
+                    hgather.attempt_type = 'mining';
+                else
+                    hgather.attempt_type = '';
+                end
+                
+                if (hgather.attempt_type ~= '') then
+                    hgather.last_attempt = ashita.time.clock()['ms'];
+                    if (hgather.settings.first_attempt == 0) then
+                        hgather.settings.first_attempt = ashita.time.clock()['ms'];
+                    end
+                end
+            end
         end
+
     end
 end);
 
@@ -1221,6 +1255,20 @@ ashita.events.register('text_in', 'text_in_cb', function (e)
             end
     
             handle_harv(harv_success);
+        end
+        hgather.attempt_type = '';
+    elseif (hgather.attempt_type == 'helm' and last_attempt_secs < 60) then
+        mine_success = string.match(message, 'dig up an? ([^,!]+)');
+        mine_break = string.match(message, 'our pickaxe breaks');
+        mine_unable = string.match(message, 'unable to mine anything.');
+
+        -- mining logic
+        if (mine_success or mine_break or mine_unable) then
+            if (mine_break) then
+                hgather.settings.mine_break = hgather.settings.mine_break + 1;
+            end
+    
+            handle_mine(mine_success);
         end
         hgather.attempt_type = '';
     end
