@@ -1027,7 +1027,11 @@ ashita.events.register('command', 'command_cb', function (e)
 
     if (#args >= 2 and args[2]:any('fallback')) then
         if (args[3] ~= nil) then
-            hgather.fallback = args[3];
+            if (args[3] == 'c') then
+                hgather.fallback = '';
+            else
+                hgather.fallback = args[3];
+            end
         else
             print(chat.header(addon.name):append(chat.message('Set fallback activity. h = harvesting, e = excavating, l = logging, m = mining, c = clear')));
         end
