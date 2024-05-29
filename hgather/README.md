@@ -1,6 +1,7 @@
 # HGather
 This is a simple dig tracker for FFXI. This addon works with Ashita v4.
 
+Modified by Meatclump to add fallback setting for use with \<lastst\>
 
 ## Commands
 /hgather or /hgather editor - Opens the configuration menu
