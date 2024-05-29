@@ -1,5 +1,5 @@
 # HGather
-This is a simple dig tracker for FFXI. This addon works with Ashita v4. 
+This is a simple dig tracker for FFXI. This addon works with Ashita v4.
 
 
 ## Commands
@@ -14,6 +14,8 @@ This is a simple dig tracker for FFXI. This addon works with Ashita v4.
 /hgather report - Prints the dig data to chatlog
 
 /hgather clear - Clears the digging session data
+
+/hgather fallback - Set fallback activity or clear fallback (h | e | l | m | c)
 
 ## Pricing
 Pricing for items is listed under the configuration window under the Items tab. Make sure the format is as follows:
